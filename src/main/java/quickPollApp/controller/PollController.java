@@ -14,6 +14,7 @@ import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
+@CrossOrigin("*")
 public class PollController {
     @Inject
     private PollRepository pollRepository;
@@ -56,10 +57,15 @@ public class PollController {
     }
     @RequestMapping(value = "/polls/{pollId}", method = RequestMethod.PUT)
     public ResponseEntity<?> updatePoll(@RequestBody Poll poll, @PathVariable Long pollId){
-        verifyPoll(pollId);
-        //save the entity
-         Poll p = pollRepository.save(poll);
-         return new ResponseEntity<>(HttpStatus.OK);
+        if(pollRepository.existsById(pollId)){
+             verifyPoll(pollId);
+             Poll p = pollRepository.save(poll);
+             return new ResponseEntity<>(HttpStatus.OK);
+
+         }else{
+            return createPoll(poll);
+
+         }
     }
     @RequestMapping(value = "/polls/{pollId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deletePoll (@PathVariable Long pollId){
